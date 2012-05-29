@@ -1,0 +1,605 @@
+<html>
+	<head>
+		<title>StackMob - Adding a Backend to your JS App</title>
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+		<script type="text/javascript" src="http://static.stackmob.com/js/json2-min.js"></script>
+		<script type="text/javascript" src="http://static.stackmob.com/js/underscore-1.3.3-min.js"></script>
+		<script type="text/javascript" src="http://static.stackmob.com/js/backbone-0.9.2-min.js"></script>
+		<script type="text/javascript" src="http://static.stackmob.com/js/stackmob-js-0.2.1-min.js"></script>
+		<script type="text/javascript" src="http://static.stackmob.com/resources/js/jsonFormatter-0.1.0-min.js"></script>
+		<script type="text/javascript" src="stackmob-debug.js"></script>
+		
+		<!-- Include required JS files -->
+		<script type="text/javascript" src="../syntaxhighlighter/scripts/shCore.js"></script>
+		 
+		<!--
+		    At least one brush, here we choose JS. You need to include a brush for every 
+		    language you want to highlight
+		-->
+		<script type="text/javascript" src="../syntaxhighlighter/scripts/shBrushJScript.js"></script>
+		<script type="text/javascript" src="../syntaxhighlighter/scripts/shBrushXml.js"></script>
+		<script type="text/javascript" src="../syntaxhighlighter/scripts/shBrushJava.js"></script>
+		 
+		<!-- Include *at least* the core style and default theme -->
+		<link href="../syntaxhighlighter/styles/shCoreMidnight.css" rel="stylesheet" type="text/css" />
+		<link href="../syntaxhighlighter/styles/shThemeMidnight.css" rel="stylesheet" type="text/css" />
+		
+		<style type="text/css">
+			.syntaxhighlighter { 
+				margin: 0px !important; padding-top: 15px; padding-bottom: 15px;
+				border-radius: 10px; -moz-border-radius: 10px; -webkit-border-radius: 10px; 
+			
+			}
+		</style>
+		
+		<script type="text/javascript">
+			   StackMob.init({
+				    appName: "fluent2012",
+				    clientSubdomain: "stackmob339",
+				    apiVersion: 0
+				  });
+			  
+			  var Todo = StackMob.Model.extend({
+			  	schemaName: 'todo'
+			  });
+			  
+			  var Todos = StackMob.Collection.extend({
+			  	model: Todo
+			  });
+			  
+			  $(document).ready(function() {
+			  	SyntaxHighlighter.config.tagName = 'code';
+			  	SyntaxHighlighter.config.toolbar = false;
+			  	SyntaxHighlighter.all();
+			  	
+			  	Reveal.addEventListener('stampede', function() {
+			  		$('#stampede').attr('src', 'http://dl.dropbox.com/u/77348001/stampede.gif');
+			  	});
+			  });
+		</script>
+
+		<link rel="stylesheet" href="../reveal.js/css/reset.css">
+		<link rel="stylesheet" href="../reveal.js/css/main.css">
+		<style type="text/css" media="screen">
+			.button, .button a
+{
+	background: #98be47;
+	background: linear-gradient(top, #a8cf43, #98be47);
+	background: -moz-linear-gradient(top, #a8cf43, #98be47);
+	background: -ms-linear-gradient(top, #a8cf43, #98be47);
+	background: -o-linear-gradient(top, #a8cf43, #98be47);
+	background: -webkit-linear-gradient(top, #a8cf43, #98be47);
+	border: 1px solid #8cac42;
+	border-bottom-color: #7b9b36;
+	border-radius: 4px;
+	border-top-color: #94b146;
+	box-shadow: 0 2px 2px rgba(0, 0, 0, .2), inset 0 1px 0 rgba(255, 255, 255, .5);
+	color: #fff !important;
+	cursor: pointer;
+	font-family: "Helvetica Neue", Arial, sans-serif;
+	font-size: 26px;
+	font-weight: bold;
+	moz-border-radius: 4px;
+	moz-box-shadow: 0 2px 2px rgba(0, 0, 0, .2), inset 0 1px 0 rgba(255, 255, 255, .5);
+	ms-border-radius: 4px;
+	ms-box-shadow: 0 2px 2px rgba(0, 0, 0, .2), inset 0 1px 0 rgba(255, 255, 255, .5);
+	o-border-radius: 4px;
+	o-box-shadow: 0 2px 2px rgba(0, 0, 0, .2), inset 0 1px 0 rgba(255, 255, 255, .5);
+	padding: 6px 14px;
+	text-decoration: none;
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, .4);
+	webkit-border-radius: 4px;
+	webkit-box-shadow: 0 2px 2px rgba(0, 0, 0, .2), inset 0 1px 0 rgba(255, 255, 255, .5);
+}
+.button:hover, .button a:hover
+{
+	background: #67a215;
+	background: linear-gradient(top, #9dbf46, #67a215);
+	background: -moz-linear-gradient(top, #9dbf46, #67a215);
+	background: -ms-linear-gradient(top, #9dbf46, #67a215);
+	background: -o-linear-gradient(top, #9dbf46, #67a215);
+	background: -webkit-linear-gradient(top, #9dbf46, #67a215);
+	border: 1px solid #699631;
+	border-bottom-color: #457119;
+	border-top-color: #6d9e34;
+	color: rgba(250, 250, 250, .96);
+	text-decoration: none;
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, .8);
+}
+.button:active, .button a:active
+{
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5);
+	moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5);
+	ms-box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5);
+	o-box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5);
+	padding: 4px 14px 7px;
+	webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5);
+}
+.button.blue, .button.blue a
+{
+	background: #6bbad7;
+	background: linear-gradient(top, #76cced, #6bbad7);
+	background: -moz-linear-gradient(top, #76cced, #6bbad7);
+	background: -ms-linear-gradient(top, #76cced, #6bbad7);
+	background: -o-linear-gradient(top, #76cced, #6bbad7);
+	background: -webkit-linear-gradient(top, #76cced, #6bbad7);
+	border: 1px solid #4ca8ca;
+	border-bottom-color: #4c9bb9;
+	border-top-color: #4cb2da;
+}
+.button.blue:hover, .button.blue a:hover
+{
+	background: #2c9cc6;
+	background: linear-gradient(top, #3cb7e5, #2c9cc6);
+	background: -moz-linear-gradient(top, #3cb7e5, #2c9cc6);
+	background: -ms-linear-gradient(top, #3cb7e5, #2c9cc6);
+	background: -o-linear-gradient(top, #3cb7e5, #2c9cc6);
+	background: -webkit-linear-gradient(top, #3cb7e5, #2c9cc6);
+	border: 1px solid #0083b4;
+	border-bottom-color: #00709b;
+	border-top-color: #0092ca;
+}
+
+#stackmoblogo {
+	position: fixed;
+	top: 20px;
+	left: 20px;
+}
+		</style>
+		
+	</head>
+	<body>
+		<div id="stackmoblogo"><img src="../images/stackmob_logo.png"/></div>
+		<div id="reveal">
+			<div class="state-background"></div>
+			
+			<div class="slides">
+				<section>
+					<h2>&nbsp;</h2>
+					<h2>Helping you do more, with less</h2>
+					<h3 class="inverted">StackMob &amp; JavaScript</h3>
+				
+				</section>	
+					
+
+				<section>
+					<h2>Ancient Times</h2>
+					<img src ="../images/1stGen.png" alt="StackMob Diagram"/>
+				</section>
+
+				<section>
+					<h2>Middle Ages</h2>
+					<img src ="../images/2ndGen.png" alt="StackMob Diagram"/>
+				</section>
+
+				<section>
+					<h2>Here's your JetPack</h2>
+					<img src ="../images/3rdGen.png" alt="StackMob Diagram"/>
+				</section>
+					
+
+
+				<section>
+						<h2>Add Backbone & StackMob JS</h2>
+						
+						<pre><code class="brush: xml; highlight: [5]">
+						http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js
+						http://static.stackmob.com/js/json2-min.js
+						http://static.stackmob.com/js/underscore-1.3.3-min.js
+						http://static.stackmob.com/js/backbone-0.9.2-min.js
+						http://static.stackmob.com/js/stackmob-js-0.2.1-min.js
+						</code></pre>
+				</section>
+
+
+	
+				<section>
+					<h2>Initialize</h2>
+
+					<pre><code class="brush: javascript;">
+					StackMob.init({
+						appName: 'fluent2012',
+						clientSubdomain: 'stackmob',
+						apiVersion: 0
+					});
+					</code></pre>
+					
+				</section>
+					
+										
+				
+				<section>
+					<section>
+						<h2>Save to "todo" table</h2>
+
+						Syntax:
+
+						<pre><code class="brush: javascript; highlight: [3,13]">
+						//Declare once per page
+						var Todo = StackMob.Model.extend({ 
+							schemaName: 'todo' 
+						});
+
+						...
+
+						var myToDo = new Todo({
+							action: 'Find clean underwear',
+							priority: 'low'
+						});
+
+						myToDo.create();
+						</code></pre>
+
+					</section>
+
+
+
+
+
+					<section>
+						<h2>Try Creating</h2>
+							
+						<p>var todo = new Todo(</p>
+<textarea id="createtodo" >
+{ 
+	"action": "", 
+	"priority": "high",
+	"done": false,
+	"reminders": 
+	  ["monday","tuesday", "wednesday"] 
+}
+</textarea>
+<p>);</p>
+
+<p>todo.create();</p>
+
+<p><input id="create" type="button" class="button" value="Create"/></p>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$('#create').click(function() {
+			var json = $('#createtodo').val().trim();
+			var todo = new Todo(JSON.parse(json));
+			todo.create(SMDebug.callbacks('Creating TODO', {
+				target: 'createtodo',
+				success: function(model) {
+					$('#readitem').val(model.get('todo_id'));
+					$('#updateitem').val(model.get('todo_id'));
+					$('#deleteitem').val(model.get('todo_id'));
+				}
+			}));
+		});
+	});
+</script>
+
+						</section>
+					
+					</section>
+
+
+					<section>
+						<section>
+							<h2>Read from DB</h2>
+							<a href="javascript:void(0);">Read Item</a>
+	<pre><code class="brush: javascript;">
+	var todo = new Todo({ todo_id: '1234' });
+	todo.fetch(callbacks);
+	</code></pre>
+						</section>
+						<section>
+							<h2>Try Read by ID</h2>
+	
+	<p>var todo = new Todo({ todo_id: <input id="readitem" type="text" value="" style="width:150px"/> });</p>
+	<p>todo.fetch();</p>
+	
+	<p>
+		<textarea id="readtodo"></textarea>
+	</p>
+	
+	<p><input id="read" type="button" class="button" value="Read Item"/></p>
+	
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('#read').click(function() {
+				var id = $('#readitem').val().trim();
+				var todo = new Todo({ todo_id: id });
+				todo.fetch(SMDebug.callbacks('Reading TODO', 'readtodo'));
+			});
+		});
+	</script>
+						</section>
+					</section>
+				
+				<section>
+					<section>
+						<h2>Update DB</h2>
+						
+						<a href="javascript:void(0);">Update Item</a>
+<pre><code class="brush: javascript;">
+var todo = new Todo({ todo_id: '1234' });
+todo.save({ somethingnew: 'hi'}, callbacks);
+</code></pre>
+					</section>
+					<section>
+						<h2>Try Updating!</h2>
+	<p>var todo = new Todo({ todo_id: <input id="updateitem" type="text" value="" style="width:150px"/> });</p>
+	<p>todo.save(</p>
+	
+	<p>
+<textarea id="updatetodo">
+{ 
+	"action": "updating done to true", 
+	"done": true
+}
+</textarea>
+	</p>
+	
+	<p>);</p>
+	
+	<p><input id="update" type="button" class="button" value="Update Item"/></p>
+	
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('#update').click(function() {
+				var id = $('#updateitem').val().trim();
+				var todo = new Todo({ todo_id: id });
+				var json = JSON.parse($('#updatetodo').val().trim());
+				todo.save(json, SMDebug.callbacks('Update TODO', 'updatetodo'));
+			});
+		});
+	</script>						
+					</section>
+				</section>
+						
+				<section>
+					<section>
+						<h2>Delete from DB</h2>
+						
+						<a href="javascript:void(0);">Delete Item</a>
+<pre><code class="brush: javascript;">
+var todo = new Todo({ todo_id: '1234' });
+todo.destroy(callbacks);
+</code></pre>
+					</section>
+					<section>
+						<h2>Try Deleting!</h2>
+	<p>var todo = new Todo({ todo_id: <input id="deleteitem" type="text" value="" style="width:150px"/> });</p>
+	<p>todo.destroy();</p>
+	
+	<p><input id="delete" type="button" class="button" value="Delete Item"/></p>
+	
+	<textarea id="deletetodo"></textarea>
+	
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('#delete').click(function() {
+				var id = $('#deleteitem').val().trim();
+				var todo = new Todo({ todo_id: id });
+				todo.destroy(SMDebug.callbacks('Delete TODO', {
+					target: 'deletetodo',
+					success: function(result) {
+						$('#deletetodo').val('Item ' + id + ' deleted!');
+					}
+				}));
+			});
+		});
+	</script>						
+					</section>
+				</section>
+				
+				<section>
+					<section>
+						<h2>Collections</h2>
+						<pre><code class="brush: javascript">
+						//From earlier..
+						var Todo = StackMob.Model.extend({
+							schemaName: 'todo'
+						});	
+						
+						...
+							
+						//Same as Backbone..
+						var Todos = StackMob.Collection.extend({
+							model: Todo
+						});
+						
+						var todos = new Todos();
+						todos.fetch();
+						</code></pre>					
+						
+					</section>
+					<section>
+						<h2>Fetch your Todos!</h2>
+	<p>var todos = new Todos();</p>
+	<p>todos.fetch();</p>
+	
+	<p><input id="fetchcollection" type="button" class="button" value="Fetch your Todos"/></p>
+	
+	<textarea id="fetchtodos"></textarea>
+	
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('#fetchcollection').click(function() {
+				var todos = new Todos();
+				todos.fetch(SMDebug.callbacks('Fetch Todos', 'fetchtodos'));
+			});
+		});
+	</script>						
+					</section>					
+				</section>
+				
+				<section>
+					<section>
+						<h2>Queries: Fetching specific models</h2>
+						
+						<p>Getting Finished Todos</p>
+	<pre><code class="brush: javascript;">
+	var q = new StackMob.Collection.Query();
+	q.equals('done', true);
+	
+	var todos = new Todos();
+	todos.query(q, callbacks);	
+	</code></pre>
+					</section>
+					<section>
+						<h2>Get Finished Todos</h2>
+<pre><code class="brush: javascript;">
+var q = new StackMob.Collection.Query();
+q.equals('done', true);
+
+var todos = new Todos();
+todos.query(q, callbacks);	
+</code></pre>						
+						<p><input type="button" class="button" id="querycollection" value="Get Finished Todos"/></p>
+						
+						<textarea id="fetchfinishedtodos"></textarea>
+						
+						<script type="text/javascript">
+							$(document).ready(function() {
+								$('#querycollection').click(function() {
+									var q = new StackMob.Collection.Query();
+									q.equals('done', true);
+									
+									var todos = new Todos();
+									todos.query(q, SMDebug.callbacks('Query Finished Todos', 'fetchfinishedtodos'));		
+								});
+							});
+						</script>
+					</section>
+				</section>
+
+
+
+
+
+
+
+				<section>
+						<h2>Web Dashboard</h2>
+						
+						<p><a href="https://www.stackmob.com/platform/api/schemas/" target="_blank"><img width="500px" src="https://s3.amazonaws.com/static.stackmob.com/images/screenshots/overview/StackMob_Manage_Schemas.png" alt="StackMob: Object Browser"/></a></p>
+					
+				</section>
+
+
+			
+					
+						
+						
+					
+					<section>
+						<h2>Your Datastore And ...</h2>
+						<ul>
+							<li>User Authentication</li>
+							<li>Geo Location</li>
+							<li>Push</li>
+							<li>Hosting</li>
+							<li>Social Integration</li>
+							<li>Custom Server Side Code</li>
+							<li>Analytics</li>
+							<li>...</li>
+						</ul>
+					</section>
+						
+						
+					
+
+
+
+
+
+
+
+						<section>
+							<h2>StackMob: Investors</h2>
+							
+							<p>Share same early investors:</p>
+							<ul>
+								<li>Heroku</li>
+								<li>Twitter</li>
+								<li>Instagram</li>
+								<li>OMGPop</li>
+								<li>New Relic</li>
+							</ul>
+						
+						</section>
+						
+
+						<section>
+							<h2>StackMob: Who uses us?</h2>
+							
+							<p>We've powered apps:</p>
+							<ul>
+								<li>AppStore Top 20 Apps</li>
+								<li>TechCrunch Disrupt</li>
+								<li>SXSW</li>
+								<li>Won Startup Weekend</li>
+								<li>Atari</li>
+							</ul>
+							<p>Games, Enterprise Apps, Social... </p>
+							<p>iOS, Android, JavaScript, Ruby, PHP, Python, Java</p>
+						</section>
+						
+						
+
+
+
+
+				
+				<section>
+					<h2>Do more with StackMob</h2>
+					<ul>
+						<li>Simple</li>
+						<li>Seamless</li>
+						<li>Flexible</li>
+						<li>Powerful</li>
+				
+					</ul>
+				</section>
+				
+				
+
+			</div>
+			
+			<!-- The navigational controls UI -->
+			<aside class="controls">
+				<a class="left" href="#">&#x25C4;</a>
+				<a class="right" href="#">&#x25BA;</a>
+				<a class="up" href="#">&#x25B2;</a>
+				<a class="down" href="#">&#x25BC;</a>
+			</aside>
+
+			<!-- Displays presentation progress, max value changes via JS to reflect # of slides -->
+			<div class="progress"><span></span></div>
+			
+		</div>
+		<script type="text/javascript" src="../reveal.js/js/reveal.js"></script>
+		<script type="text/javascript">
+			Reveal.initialize({
+				// Display controls in the bottom right corner
+				controls: true,
+
+				// Display a presentation progress bar
+				progress: true,
+
+				// If true; each slide will be pushed to the browser history
+				history: true,
+
+				// Loops the presentation, defaults to false
+				loop: false,
+
+				// Flags if mouse wheel navigation should be enabled
+				mouseWheel: false,
+
+				// UI style
+				theme: 'default', // default/neon
+				
+				rollingLinks: false,
+
+				// Transition style
+				transition: 'default' // default/cube/page/concave/linear(2d)
+			});
+		</script>
+		
+	</body>
+</html>
